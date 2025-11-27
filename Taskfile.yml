@@ -1,0 +1,30 @@
+version: '3'
+
+vars:
+  VERSION_TAG:
+    sh: git symbolic-ref -q --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null
+
+tasks:
+  build:
+    desc: Build the fns tool for the current system (Windows or Linux) for the AMD64 architecture without debug symbols.
+    vars:
+      LDFLAG_VERSION: github.com/Krzysztofz01/fns/cmd.Version={{.VERSION_TAG}}
+    cmds:
+      - cmd: GOOS=windows GOARCH=amd64 go build -v -trimpath -ldflags="-s -w -X {{.LDFLAG_VERSION}}" -o bin/fns.exe .
+        platforms: [ windows ]
+      - cmd: GOOS=linux GOARCH=amd64 go build -v -trimpath -ldflags="-s -w -X {{.LDFLAG_VERSION}}" -o bin/fns .
+        platforms: [ linux ]
+      - cmd: cp LICENSE bin/LICENSE
+
+  test:
+    desc: Run tests for all packages.
+    cmds:
+      - go test ./...
+
+  test:cover:
+    desc: Run tests for all packages and generate a coverage report.
+    vars:
+      COVERAGE: coverage.out
+    cmds:
+      - go test -coverprofile {{.COVERAGE}} ./...
+      - go tool cover -html {{.COVERAGE}}
