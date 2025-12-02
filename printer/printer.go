@@ -3,6 +3,7 @@ package printer
 import (
 	"fmt"
 	"github.com/pterm/pterm"
+	"os"
 	"sync"
 )
 
@@ -28,12 +29,18 @@ type Printer interface {
 	Info(msg string, args ...any)
 	Warn(msg string, args ...any)
 	Error(msg string, args ...any)
+	ErrorStdErr(msg string, args ...any)
 	FuzzySelect(msg string, values []string) (string, error)
 	Print(msg string)
 	Printf(msg string, args ...any)
 }
 
 type printer struct {
+}
+
+func (p printer) ErrorStdErr(msg string, args ...any) {
+	msg = fmt.Sprintf(msg, args...)
+	_, _ = fmt.Fprintln(os.Stderr, msg)
 }
 
 func (p printer) Info(msg string, args ...any) {

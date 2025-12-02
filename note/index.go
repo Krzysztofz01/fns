@@ -9,6 +9,8 @@ import (
 	"io/fs"
 	"path/filepath"
 
+	"github.com/Krzysztofz01/fns/config"
+	"github.com/Krzysztofz01/fns/printer"
 	"github.com/Krzysztofz01/fns/utils"
 )
 
@@ -68,12 +70,20 @@ func IndexNotes(ctx context.Context, paths ...string) ([]Note, error) {
 }
 
 func indexNoteDir(ctx context.Context, p string) ([]Note, error) {
-	notes := make([]Note, 0, defaultNoteSliceCapacity)
+	var (
+		skipInvalidNoteFiles bool   = config.GetConfiguration().SkipInvalidNoteFiles
+		notes                []Note = make([]Note, 0, defaultNoteSliceCapacity)
+	)
 
-	err := filepath.Walk(p, func(walkPath string, info fs.FileInfo, walkErr error) error {
-		// TODO: Do not fail all if one file access fails
-		if walkErr != nil {
-			return fmt.Errorf("note: indexing file access failed: %w", walkErr)
+	walkErr := filepath.Walk(p, func(walkPath string, info fs.FileInfo, err error) error {
+		if err != nil {
+			err = fmt.Errorf("note: indexing file access failed: %w", err)
+			if skipInvalidNoteFiles {
+				printer.GetPrinter().ErrorStdErr(err.Error())
+				return nil
+			} else {
+				return err
+			}
 		}
 
 		select {
@@ -90,21 +100,26 @@ func indexNoteDir(ctx context.Context, p string) ([]Note, error) {
 			return nil
 		}
 
-		// TODO: Do not fail all if one note parsing fails
 		note, err := NewNote(walkPath)
 		if err != nil {
-			return fmt.Errorf("note: failed to create the note: %w", err)
+			err = fmt.Errorf("note: failed to create the note: %w", err)
+			if skipInvalidNoteFiles {
+				printer.GetPrinter().ErrorStdErr(err.Error())
+				return nil
+			} else {
+				return err
+			}
 		}
 
 		notes = append(notes, note)
 		return nil
 	})
 
-	if err != nil {
-		if errors.Is(err, io.EOF) {
-			return nil, fmt.Errorf("note: note indexing was interrupted: %w", err)
+	if walkErr != nil {
+		if errors.Is(walkErr, io.EOF) {
+			return nil, fmt.Errorf("note: note indexing was interrupted: %w", walkErr)
 		} else {
-			return nil, fmt.Errorf("note: note indexing failed: %w", err)
+			return nil, fmt.Errorf("note: note indexing failed: %w", walkErr)
 		}
 	} else {
 		return notes, nil

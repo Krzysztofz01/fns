@@ -33,6 +33,7 @@ type Configuration struct {
 	NoteWriteDirectoryPath string   `mapstructure:"note-write-directory-path"`
 	EditorPath             string   `mapstructure:"editor-path"`
 	TrimNote               bool     `mapstructure:"trim-note"`
+	SkipInvalidNoteFiles   bool     `mapstructure:"skip-invalid-note-files"`
 }
 
 func loadConfiguration() *Configuration {
@@ -48,6 +49,7 @@ func loadConfiguration() *Configuration {
 	viper.SetDefault("note-write-directory-path", "")
 	viper.SetDefault("editor-path", "")
 	viper.SetDefault("trim-note", true)
+	viper.SetDefault("skip-invalid-note-files", true)
 
 	if err := viper.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("config: failed to read the config file: %w", err))
