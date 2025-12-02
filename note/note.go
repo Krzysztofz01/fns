@@ -8,10 +8,10 @@ import (
 	"github.com/Krzysztofz01/fns/utils"
 )
 
-type NoteType int
+type Type int
 
 const (
-	None NoteType = iota
+	None Type = iota
 	Plain
 	Markdown
 )
@@ -20,17 +20,17 @@ type Note interface {
 	GetPath() string
 	GetName() string
 	GetSearchVector() string
-	GetType() NoteType
+	GetType() Type
 }
 
 type note struct {
 	Path         string
 	Name         string
 	SearchVector string
-	Type         NoteType
+	Type         Type
 }
 
-func (n *note) GetType() NoteType {
+func (n *note) GetType() Type {
 	return n.Type
 }
 
@@ -47,7 +47,7 @@ func (n *note) GetName() string {
 }
 
 func NewNote(p string) (Note, error) {
-	var t NoteType
+	var t Type
 	switch strings.ToLower(path.Ext(p)) {
 	case ExtPlain:
 		t = Plain

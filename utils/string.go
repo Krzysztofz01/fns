@@ -1,13 +1,16 @@
 package utils
 
-import "strings"
+import (
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+)
 
 func Capitalize(s string) string {
 	if len(s) == 0 {
 		return ""
 	}
 
-	return strings.Title(s)
+	return cases.Title(language.Und, cases.NoLower).String(s)
 }
 
 func TrimSelectedWhitespace(b []byte) []byte {
