@@ -28,12 +28,25 @@ func GetConfiguration() *Configuration {
 	return instance
 }
 
+func GetDefaultConfiguration() *Configuration {
+	c := defaultConfiguration
+	return &c
+}
+
 type Configuration struct {
 	NoteReadDirectoryPaths []string `mapstructure:"note-read-directory-paths"`
 	NoteWriteDirectoryPath string   `mapstructure:"note-write-directory-path"`
 	EditorPath             string   `mapstructure:"editor-path"`
 	TrimNote               bool     `mapstructure:"trim-note"`
 	SkipInvalidNoteFiles   bool     `mapstructure:"skip-invalid-note-files"`
+}
+
+var defaultConfiguration Configuration = Configuration{
+	NoteReadDirectoryPaths: []string{},
+	NoteWriteDirectoryPath: "",
+	EditorPath:             "",
+	TrimNote:               true,
+	SkipInvalidNoteFiles:   true,
 }
 
 func loadConfiguration() *Configuration {
@@ -45,11 +58,11 @@ func loadConfiguration() *Configuration {
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType(configFileType)
 
-	viper.SetDefault("note-read-directory-paths", []string{})
-	viper.SetDefault("note-write-directory-path", "")
-	viper.SetDefault("editor-path", "")
-	viper.SetDefault("trim-note", true)
-	viper.SetDefault("skip-invalid-note-files", true)
+	viper.SetDefault("note-read-directory-paths", defaultConfiguration.NoteReadDirectoryPaths)
+	viper.SetDefault("note-write-directory-path", defaultConfiguration.NoteWriteDirectoryPath)
+	viper.SetDefault("editor-path", defaultConfiguration.EditorPath)
+	viper.SetDefault("trim-note", defaultConfiguration.TrimNote)
+	viper.SetDefault("skip-invalid-note-files", defaultConfiguration.SkipInvalidNoteFiles)
 
 	if err := viper.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("config: failed to read the config file: %w", err))
