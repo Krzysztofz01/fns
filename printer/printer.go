@@ -31,11 +31,20 @@ type Printer interface {
 	Error(msg string, args ...any)
 	ErrorStdErr(msg string, args ...any)
 	FuzzySelect(msg string, values []string) (string, error)
+	TextInput(msg string) (string, error)
 	Print(msg string)
 	Printf(msg string, args ...any)
 }
 
 type printer struct {
+}
+
+func (p printer) TextInput(msg string) (string, error) {
+	if value, err := pterm.DefaultInteractiveTextInput.Show(msg); err != nil {
+		return "", fmt.Errorf("printer: failed to perform the text input: %w", err)
+	} else {
+		return value, nil
+	}
 }
 
 func (p printer) ErrorStdErr(msg string, args ...any) {
