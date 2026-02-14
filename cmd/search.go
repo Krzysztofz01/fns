@@ -12,7 +12,13 @@ import (
 	"github.com/Krzysztofz01/fns/utils"
 )
 
+var (
+	PrintPath bool
+)
+
 func init() {
+	searchCmd.PersistentFlags().BoolVarP(&PrintPath, "path", "p", false, "Print the file path instead of its content.")
+
 	rootCmd.AddCommand(searchCmd)
 }
 
@@ -53,6 +59,11 @@ var searchCmd = &cobra.Command{
 		if !ok {
 			printer.GetPrinter().Error("Failed to access the selected note.")
 			return fmt.Errorf("cmd: the selected note is not present in the lookup")
+		}
+
+		if PrintPath {
+			printer.GetPrinter().Printf("%s\n", note.GetPath())
+			return nil
 		}
 
 		file, err := os.Open(note.GetPath())

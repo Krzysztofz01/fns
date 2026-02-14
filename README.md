@@ -37,7 +37,7 @@ Below is an example of the `.fns` dotfile. **You must provide the notes read and
   "note-write-directory-path": "/home/hello/store-new-notes-here", // It can be one of the paths above.
   "editor-path": "", // Leave empty to use the one specified by $EDITOR
   "trim-note": true,
-  "SkipInvalidNoteFiles": true
+  "skip-invalid-note-files": true
 }
 ```
 
@@ -57,6 +57,11 @@ To perform a fuzzy note search use:
 fns search
 ```
 The content of the selected note will be printed to the terminal.
+
+If you want to access the note path instead of the content use:
+```shell
+fns search --path
+```
 
 
 ### Version check
