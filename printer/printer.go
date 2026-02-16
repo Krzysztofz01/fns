@@ -34,6 +34,7 @@ type Printer interface {
 	TextInput(msg string) (string, error)
 	Print(msg string)
 	Printf(msg string, args ...any)
+	Progress(msg string, n int) (func(), func(), error)
 }
 
 type printer struct {
@@ -89,4 +90,27 @@ func (p printer) Print(msg string) {
 
 func (p printer) Printf(msg string, args ...any) {
 	pterm.DefaultBasicText.Printf(msg, args...)
+}
+
+func (p printer) Progress(msg string, n int) (func(), func(), error) {
+	progress, err := pterm.DefaultProgressbar.
+		WithTitle(msg).
+		WithTotal(n).
+		WithShowPercentage().
+		WithRemoveWhenDone().
+		Start()
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("printer: failed to start the progress: %w", err)
+	}
+
+	stepFunc := func() {
+		progress.Increment()
+	}
+
+	finalizeFunc := func() {
+		_, _ = progress.Stop()
+	}
+
+	return stepFunc, finalizeFunc, nil
 }

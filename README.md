@@ -80,3 +80,12 @@ To check the default configuration
 ```shell
 fns config --default
 ```
+
+### Backup notes
+To create a backup of all notes that are accessible via fns use:
+```shell
+fns backup
+```
+
+A archive in ZIP format will be created in the current working directory, containing all the notes
+with the original file and parent directory name.
