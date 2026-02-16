@@ -63,6 +63,14 @@ If you want to access the note path instead of the content use:
 fns search --path
 ```
 
+### Edit note
+To edit an existing note use:
+```shell
+fns edit
+```
+First, the note must be selected. This is done using fuzzy search, just like in the search command.
+Once the note is selected, it will be opened in the config specified editor.
+
 
 ### Version check
 To check the version of fns use:
