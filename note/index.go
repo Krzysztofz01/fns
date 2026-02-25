@@ -8,6 +8,8 @@ import (
 	"io"
 	"io/fs"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"github.com/Krzysztofz01/fns/config"
 	"github.com/Krzysztofz01/fns/printer"
@@ -65,6 +67,10 @@ func IndexNotes(ctx context.Context, paths ...string) ([]Note, error) {
 			notes = append(notes, resultNote)
 		}
 	}
+
+	slices.SortFunc(notes, func(a, b Note) int {
+		return strings.Compare(a.GetName(), b.GetName())
+	})
 
 	return notes, nil
 }
