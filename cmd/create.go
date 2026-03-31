@@ -29,7 +29,7 @@ var createCmd = &cobra.Command{
 		var filename string
 		if len(args) == 0 {
 			var err error
-			if filename, err = printer.GetPrinter().TextInput("File name (with extension):"); err != nil {
+			if filename, err = printer.GetPrinter().TextInput("File name (with extension)"); err != nil {
 				printer.GetPrinter().Error("Failed to provide the note file name")
 				return fmt.Errorf("cmd: failed to access the file name via text input: %w", err)
 			}
