@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,9 +41,16 @@ func Execute(args []string) {
 		cancel()
 	}()
 
-	// NOTE: Preload singletons (configuration and printer)
-	_ = config.GetConfiguration()
+	c := config.GetConfiguration()
+
+	// NOTE: Preload singleton printer
 	_ = printer.GetPrinter()
+
+	if c.UseSearchAsDefaultCommand && fallbackToDefaultCommand(args) {
+		args = append([]string{searchCmd.Use}, args[1:]...)
+	} else {
+		args = args[1:]
+	}
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetContext(ctx)
@@ -53,6 +62,23 @@ func Execute(args []string) {
 
 	cancel()
 	os.Exit(0)
+}
+
+func fallbackToDefaultCommand(args []string) bool {
+	cmd, _, err := rootCmd.Find(args[1:])
+	if err != nil {
+		return false
+	}
+
+	if cmd.Use != rootCmd.Use {
+		return false
+	}
+
+	if errors.Is(cmd.Flags().Parse(args[1:]), pflag.ErrHelp) {
+		return false
+	}
+
+	return true
 }
 
 var rootCmd = &cobra.Command{
